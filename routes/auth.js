@@ -3,6 +3,7 @@ const User = require('../module/User');
 const { registerValidation, loginValidation } = require('../validation');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const verify = required('./privateroute.js')
 
 
 
@@ -60,12 +61,25 @@ router.post("/login", async(req, res) => {
 
     //create and assign token
     const token = jwt.sign({_id: user._id}, process.env.SECRET_TOKEN);
-    
+
     res.header('auth-token', token).send(token);
 
     
 
-})
+});
+
+router.put('/logout', verify, (req, res)=>{
+    const authHeader = req.headers["authorization"];
+
+    jwt.sign(authHeader, "", { expiresIn: 1 } , (logout, err) => {
+        if (logout) {
+            res.send({msg : 'You have been Logged Out' });
+        } else {
+            res.send({msg:'Error'});
+        }
+    });
+    
+});
 
 
 module.exports = router;

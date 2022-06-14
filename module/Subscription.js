@@ -1,4 +1,6 @@
-import mongoose from "mongoose";
+
+const mongoose = require('mongoose')
+
 
 const subscriptionSchema = new mongoose.Schema({
     name: {

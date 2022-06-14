@@ -1,7 +1,7 @@
 const router = require('express').Router();
-const plan = require('../module/subscription');
+const plan = require('../module/Subscription');
 const helper = require('./helper');
-const verify = required('./sub.js')
+const verify = required('./privateroute.js')
 
 const routes =(app)=>{
 
@@ -28,7 +28,7 @@ const routes =(app)=>{
 
         sessionInfo = req.user;
 
-        if (typeof sessionInfo.sessionData == "undefined" || sessionInfo.sessionData=="") {
+        if (typeof sessionInfo == "undefined" || sessionInfo=="") {
 
             res.redirect("/");
 
@@ -40,7 +40,7 @@ const routes =(app)=>{
 
             const data={
 
-                _id : sessionInfo.sessionData.userID
+                _id : sessionInfo
 
             };
 
@@ -50,13 +50,13 @@ const routes =(app)=>{
 
             */
 
-            helper.getAllsubscription(data,(products)=>{
+            helper.getAllsubscription(data,(subscription)=>{
 
-                response.products = products;
+                response.subscription = subscription;
 
                 response.userData = {
 
-                    name : sessionInfo.sessionData.name
+                    name : sessionInfo
 
                 };
 
@@ -76,7 +76,7 @@ const routes =(app)=>{
 
         sessionInfo = req.user;
 
-        if (typeof sessionInfo.sessionData == "undefined" || sessionInfo.sessionData=="") {
+        if (typeof sessionInfo == "undefined" || sessionInfo=="") {
 
             res.redirect("/");
 
@@ -86,9 +86,9 @@ const routes =(app)=>{
 
             const data ={
 
-            userID : sessionInfo.sessionData.userID,
+                userID : sessionInfo,
 
-            data : req.body
+                data : req.body
 
             }
 
@@ -98,7 +98,7 @@ const routes =(app)=>{
 
             */
 
-            helper.payNow(data,function(error,result){
+            helper.payNow(data,(error,result)=>{
 
                 if(error){
 
@@ -108,9 +108,9 @@ const routes =(app)=>{
 
                 }else{
 
-                    sessionInfo.paypalData = result;
+                    paypalData = result;
 
-                    sessionInfo.clientData = req.body;
+                    clientData = req.body;
 
                     res.redirect(result.redirectUrl);
 
@@ -127,13 +127,13 @@ const routes =(app)=>{
     * payment success url
 
     */
-    helper.getAllsubscription(data,function(products){
+    helper.getAllsubscription(data,(subscription)=>{
 
-        response.products = products;
+        response.subscription= subscription;
 
         response.userData = {
 
-            name : sessionInfo.sessionData.name
+            _id : sessionInfo
 
         };
 
@@ -152,7 +152,7 @@ const routes =(app)=>{
 
         const PayerID = req.query.PayerID;
 
-        if (typeof sessionInfo.sessionData == "undefined" || sessionInfo.sessionData=="") {
+        if (typeof sessionInfo == "undefined" || sessionInfo=="") {
 
             res.redirect("/");
 
@@ -162,7 +162,7 @@ const routes =(app)=>{
 
             sessionInfo.state ="success";
 
-            helper.getResponse(sessionInfo,PayerID,function(response) {
+            helper.getResponse(sessionInfo,PayerID,(response)=> {
 
                 res.render('executePayement',{
 
@@ -186,7 +186,7 @@ const routes =(app)=>{
 
         sessionInfo = req.user;
 
-        if (typeof sessionInfo.sessionData == "undefined" || sessionInfo.sessionData=="") {
+        if (typeof sessionInfo == "undefined" || sessionInfo=="") {
 
             res.redirect("/");
 
@@ -217,13 +217,7 @@ const routes =(app)=>{
     });
 
 
-    router.get('/logout',(req, res)=>{
-
-        req.session.sessionData = "";
-
-        res.redirect("/");
-
-    });
+    
  
 }
 

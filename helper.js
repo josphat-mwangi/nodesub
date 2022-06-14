@@ -1,9 +1,10 @@
-const Mongodb = require("./db");
 
+const User = require('./module/User');
+const Subscription = require('./module/Subscription')
 const paypal = require('paypal-rest-sdk');
 
-// paypal auth configuration
 
+// paypal auth configuration
 const config = {
   "port" : 5000,
   "api" : {
@@ -26,47 +27,14 @@ paypal.configure(config.api);
  
 const self={
 
-    isUserExists:(data,callback)=>{
-
-        const response={};
-
-        Mongodb.onConnect(function(db,ObjectID){
-
-            db.collection('user').findOne(data,function(err, result){
-
-            if(result != null ){
-
-                response.process = "success";
-
-                response.isUserExists = true;
-
-                response.id = result._id;
-
-                response.name = result.name;
-
-            }else{
-
-                response.process = "failed";
-
-                response.isUserExists = false;
-
-            }
-
-            callback(response);
-
-            });
-
-            });
-
-    },
 
     insertPayment:(data,callback)=>{
 
         const response={};
 
-        Mongodb.onConnect(function(db,ObjectID){
+        Mongodb.onConnect((db,ObjectID)=>{
 
-            db.collection('payments').insertOne(data,function(err, result) {
+            db.collection('payments').insertOne(data, (err, result)=>{
 
                 if(err){
 
@@ -92,58 +60,49 @@ const self={
 
     },
 
-    getSubscriptionInfo:function(data,callback){
+    getSubscriptionInfo:(data,callback)=>{
 
         const response={};
+        Subscription.findOne(data,(err, result)=>{
+            if(result != null ){
 
-        Mongodb.onConnect(function(db,ObjectID){
+                response.error = false;
 
-            data._id = new ObjectID(data._id);
+                response.data = result;
 
-            db.collection('subscription').findOne(data,function(err, result){
-                if(result != null ){
+            }else{
 
-                    response.error = false;
+                response.error = true;
 
-                    response.data = result;
+            }
 
-                }else{
-
-                    response.error = true;
-
-                }
-
-                    callback(response);
-
-            });
+                callback(response);
 
         });
 
+       
+
     },
 
-    getAllSubscription:function(data,callback){
+    getAllSubscription:(data,callback)=>{
 
-        Mongodb.onConnect(function(db,ObjectID){
+        Subscription.find().toArray((err, result)=>{
 
-            db.collection('subscription').find().toArray(function(err, result){
-
-                callback(result);
-
-                db.close();
-
-            });
+            callback(result);
 
         });
 
+     
+
     },
 
-    payNow:function(paymentData,callback){
+    payNow:(paymentData,callback)=>{
 
         let response ={};
 
     
 
-    /* Creating Payment JSON for Paypal starts */
+        /* Creating Payment JSON for Paypal starts */
 
         const payment = {
 
@@ -179,55 +138,55 @@ const self={
 
     };
 
-    /* Creating Payment JSON for Paypal ends */
+        /* Creating Payment JSON for Paypal ends */
 
-    /* Creating Paypal Payment for Paypal starts */
+        /* Creating Paypal Payment for Paypal starts */
 
-    paypal.payment.create(payment, function (error, payment) {
+        paypal.payment.create(payment,(error, payment)=> {
 
-    if (error) {
+            if (error) {
 
-    console.log(error);
+            console.log(error);
 
-    } else {
+            } else {
 
-        if(payment.payer.payment_method === 'paypal') {
+                if(payment.payer.payment_method === 'paypal') {
 
-        response.paymentId = payment.id;
+                    response.paymentId = payment.id;
 
-        var redirectUrl;
+                    let redirectUrl;
 
-        response.payment = payment;
+                    response.payment = payment;
 
-        for(var i=0; i < payment.links.length; i++) {
+                    for(let i=0; i < payment.links.length; i++) {
 
-        var link = payment.links[i];
+                        let link = payment.links[i];
 
-        if (link.method === 'REDIRECT') {
+                        if (link.method === 'REDIRECT') {
 
-        redirectUrl = link.href;
+                            redirectUrl = link.href;
 
-        }
+                        }
 
-        }
+                    }
 
-        response.redirectUrl = redirectUrl;
+                    response.redirectUrl = redirectUrl;
 
-        }
+                }
 
-        }
+            }
 
-        /*
+            /*
 
-        * Sending Back Paypal Payment response
+            * Sending Back Paypal Payment response
 
-        */
+            */
 
-        callback(error,response);
+            callback(error,response);
 
-    });
+        });
 
-    /* Creating Paypal Payment for Paypal ends */
+        /* Creating Paypal Payment for Paypal ends */
 
     },
 
@@ -286,7 +245,7 @@ const self={
                 */
                     const insertPayment={
 
-                        userId : userId,
+                        userId : data.sessionData.userID,
 
                         paymentId : paymentId,
 
