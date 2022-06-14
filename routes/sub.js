@@ -3,7 +3,7 @@ const plan = require('../module/Subscription');
 const helper = require('../helper');
 const verify = require('./privateroute.js')
 
-const routes =()=>{
+
 
 
     router.get('/', verify, (req, res)=>{
@@ -50,7 +50,7 @@ const routes =()=>{
 
             */
 
-            helper.getAllsubscription(data,(subscription)=>{
+            helper.getAllSubscription(data,(subscription)=>{
 
                 response.subscription = subscription;
 
@@ -127,23 +127,6 @@ const routes =()=>{
     * payment success url
 
     */
-    helper.getAllsubscription(data,(subscription)=>{
-
-        response.subscription= subscription;
-
-        response.userData = {
-
-            _id : sessionInfo
-
-        };
-
-        res.render('home',{
-
-            response : response
-
-        });
-
-    });
     router.get('/execute', verify, (req, res)=>{
 
         sessionInfo = req.user;
@@ -219,8 +202,8 @@ const routes =()=>{
 
     
  
-}
 
 
 
-module.exports =router;
+
+module.exports = router;

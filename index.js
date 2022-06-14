@@ -20,7 +20,7 @@ app.use(express.json());
 
 //route middleware
 app.use('/api/user', authRoute);
-app.use('api/', subRoute);
+app.use('/api/', subRoute);
 
 
 
