@@ -3,7 +3,7 @@ const User = require('../module/User');
 const { registerValidation, loginValidation } = require('../validation');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const verify = required('./privateroute.js')
+const verify = require('./privateroute.js')
 
 
 

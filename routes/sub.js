@@ -1,9 +1,9 @@
 const router = require('express').Router();
 const plan = require('../module/Subscription');
-const helper = require('./helper');
-const verify = required('./privateroute.js')
+const helper = require('../helper');
+const verify = require('./privateroute.js')
 
-const routes =(app)=>{
+const routes =()=>{
 
 
     router.get('/', verify, (req, res)=>{
@@ -221,10 +221,6 @@ const routes =(app)=>{
  
 }
 
-method.getroutes=function(){
 
-return this;
-
-}
 
 module.exports =router;
